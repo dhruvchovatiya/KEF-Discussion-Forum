@@ -35,6 +35,15 @@ const PostSchema = new mongoose.Schema(
     comments: {
       type: Array,
       required: false
+    },
+    votes: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    votedBy: {
+      type: Array,
+      required: true
     }
   },
   { timestamps: true }

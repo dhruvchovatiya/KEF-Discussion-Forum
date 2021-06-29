@@ -36,7 +36,7 @@ function App() {
           <Route path="/signup" component={SignUp} />
           <Route path="/about" component={About} />
           <Route path="/analytics" component={Analytics} />
-          <Route path="/thread/:id" component={Thread} />
+          <Route path="/thread/:id" render={(props)=><Thread loggedIn={loggedIn}/>} />
 
 
         </Switch>

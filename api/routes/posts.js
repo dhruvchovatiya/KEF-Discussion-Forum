@@ -4,6 +4,7 @@ const Post = require("../models/Post");
 const Comment = require("../models/Comment")
 const jwt = require("jsonwebtoken")
 const dotenv = require("dotenv");
+const { findById } = require("../models/User");
 
 
 dotenv.config();
@@ -53,6 +54,130 @@ router.post("/:id", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+//VOTE ANSWER
+router.post("/voteComment/:postId/:commentId", async (req, res) => {
+  
+  try {
+    const jwtUser = jwt.verify(req.body.token, process.env.JWT_SECRET)
+
+    let post = await Post.findById(req.params.postId)
+    
+    for(comment of post.comments) {
+      if(comment._id==req.params.commentId) {
+        if(req.body.up=='true') {
+          comment.votes++
+        } else {
+          comment.votes--
+        }
+        break
+      }
+    }
+    
+    let upDown = -1
+    if(req.body.up=='true') upDown=1
+    
+    post.markModified('comments');
+    const savedPost = await post.save()
+    
+    const user = await User.findById(jwtUser.id)
+    let flag=false
+    // console.log(flag)
+    for(obj of user.voted) {
+      if(obj.commentId===req.params.commentId) {
+        flag=true
+        if(req.body.up=='true') {
+          obj.vote++
+        } else {
+          obj.vote--
+        }
+      }
+    }
+    // console.log(flag)
+    if(!flag) {
+      user.voted.push({postId:req.params.postId,commentId:req.params.commentId,vote:1})
+    }
+    
+    // console.log(user)
+    user.markModified('voted')
+    const savedUser = await user.save()
+    // console.log(savedUser)
+    res.status(200).json({savedPost,savedUser})
+  
+
+  } catch (err) {
+    res.status(500).json(err)
+  }
+});
+
+// router.post("/:id", async (req,res) => {
+
+//   const voted = async () => {
+//     try {
+//       console.log('b')
+
+//       let newPost = await Post.findById(req.params.id)
+//       if(req.body.up=='true') {
+//         newPost.votes++
+//       } else {
+//         newPost.votes--
+//       }
+//       newPost.votedBy.push(user._id)
+//       user.votedPosts.push(req.params.id)
+//       newPost.save()
+//       user.save()
+//       res.status(200).json(newPost)
+//       return 
+//     } catch (err) {
+//       console.log('c')
+//       res.status(501)
+//       return 
+
+//     }
+//   }
+    
+    
+//       // try {
+//         const jwtUser = jwt.verify(req.body.token, process.env.JWT_SECRET)
+//         let user = await User.findById(jwtUser.id)
+//         // console.log(user)
+        
+//         if(user.votedPosts.includes(req.params.id)) {
+//       console.log('a')
+//       console.log(user)
+//       // throw new Error('err')
+
+//           // res.status(500) 
+//           throw {err:'error'}
+//           return
+//         }
+//             // else {
+//             //   voted()
+//             // }
+//           // try {
+
+//           //   let newPost = await Post.findById(req.params.id)
+//           //   if(req.body.up=='true') {
+//           //     newPost.votes++
+//           //   } else {
+//           //     newPost.votes--
+//           //   }
+//           //   newPost.votedBy.push(user._id)
+//           //   user.votedPosts.push(req.params.id)
+//           //   newPost.save()
+//           //   user.save()
+//           //   return res.status(200).json(newPost)
+//           // } catch (err) {
+//           //   return res.status(501)
+
+//           // }
+       
+//       // } catch(err) {
+//       //   res.status(502).json(err)
+//       // }
+
+  
+// })
 
 //ADD COMMENT
 // router.post("/:id", async (req, res) => {

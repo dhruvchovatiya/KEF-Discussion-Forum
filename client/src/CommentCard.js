@@ -4,6 +4,14 @@ import {Link} from 'react-router-dom'
 export default function CommentCard(props) {
     // const splitted = props.post.createdAt.split('T')
     // const date = toMonth(splitted[1])
+
+    if(props.isThread) {
+
+        const postId = props.postId
+        const comment = props.post
+
+        
+    }
     
     return (
         <div className="max-w-2xl px-8 py-4 mx-auto bg-white rounded-lg shadow-md dark:bg-gray-800 my-3">

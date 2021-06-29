@@ -1,11 +1,13 @@
 import React from 'react'
 import CommentCard from './CommentCard'
+import CommentCard2 from './CommentCard2'
+
 import Form from './Form'
 import {useParams} from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-export default function Thread() {
+export default function Thread(props) {
     const {id} = useParams()
 
     const [post,setPost] = useState({})
@@ -58,8 +60,9 @@ export default function Thread() {
             </div>
 
             
-            {post.comments && post.comments.map((comment,id) => (
-                <CommentCard msg='' post={comment} isThread={true}/>
+            {post.comments && post.comments.map((comment) => (
+               
+                <CommentCard2 msg='' post={comment} isThread={true} postId={id} loggedIn={props.loggedIn}/>
             ))}
 
 

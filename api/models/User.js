@@ -21,6 +21,10 @@ const UserSchema = new mongoose.Schema(
     hash_pw: {
         type: String,
         required: true
+    },
+    voted: {
+      type: Array,
+      required: true 
     }
   },
   { timestamps: true }

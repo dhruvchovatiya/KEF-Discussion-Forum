@@ -105,4 +105,14 @@ router.post('/change_pw', async (req,res) => {
 
 })
 
+router.get('/userFromJWT/:jwt', async (req,res) => {
+    try {   
+        const jwtUser = jwt.verify(req.params.jwt,process.env.JWT_SECRET)
+        const user = await User.findById(jwtUser.id)
+        res.status(200).json(user)
+    } catch (err) {
+        res.status(502).json(err)
+    }
+})
+
 module.exports = router;
