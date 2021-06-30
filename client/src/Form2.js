@@ -7,6 +7,7 @@ const FormData = require('form-data');
 
 
 
+
 export default function Form2(props) {
 
   const history = useHistory()
@@ -42,10 +43,9 @@ export default function Form2(props) {
         try {
           const res = await axios({
             method: 'post',
-            // url: 'https://api.imgur.com/3/upload?_fake_status=200',
             url: 'https://api.imgur.com/3/upload',
             headers: {
-              Authorization: 'Client-ID 3243533da9194e4'
+              Authorization: 'Client-ID '+process.env.REACT_APP_IMGUR_CLIENT_ID
             },
             data: imgurFormData
           })

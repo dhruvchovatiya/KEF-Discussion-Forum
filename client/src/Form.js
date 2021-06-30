@@ -3,7 +3,9 @@ import axios from 'axios'
 import './formCSS.css'
 import { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
+
 const FormData = require('form-data');
+
 
 
 
@@ -40,10 +42,9 @@ export default function Form(props) {
         try {
           const res = await axios({
             method: 'post',
-            // url: 'https://api.imgur.com/3/upload?_fake_status=200',
             url: 'https://api.imgur.com/3/upload',
             headers: {
-              Authorization: 'Client-ID 3243533da9194e4'
+              Authorization: 'Client-ID '+process.env.REACT_APP_IMGUR_CLIENT_ID
             },
             data: imgurFormData
           })
@@ -126,7 +127,6 @@ export default function Form(props) {
 
   return (
     <section className="w-full max-w-2xl px-6 py-4 mx-auto bg-white rounded-md shadow-md dark:bg-gray-800 my-3">
-
       <div className="mt-6 ">
 
         <div className="w-full mt-4">
