@@ -7,7 +7,7 @@ const FormData = require('form-data');
 
 
 
-export default function Form(props) {
+export default function Form2(props) {
 
   const history = useHistory()
   const [field, setField] = useState('')
@@ -22,6 +22,8 @@ export default function Form(props) {
 
   useEffect(() => {
     setPosted(true)
+    setFile()
+    setField('')
   }, [])
 
   let formData = {}
@@ -30,7 +32,7 @@ export default function Form(props) {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if(posted) {
+    if (posted) {
 
       setPosted(false)
       console.log(file)
@@ -53,23 +55,19 @@ export default function Form(props) {
           console.log(err)
         }
       }
-  
+
       formData.token = localStorage.getItem('token')
       formData.desc = field
-      formData.title = title
-  
+
       console.log(formData)
-      if ((!title || !title.trim()) && props.msg != 'Solution') {
-        alert('Title cannot be empty')
-      }
-      else if ((!field || !field.trim()) && props.msg === 'Solution') {
+      if ((!field || !field.trim()) && props.msg === 'Solution') {
         alert('Description cannot be empty')
       }
       else {
-        if (props.msg != 'Solution') {
+        
           // console.log('hhh')
           try {
-            const res = await axios.post('/api/posts', formData)
+            const res = await axios.post('/api/posts/' + props.id, formData)
             if (res.status === 502) {
               localStorage.removeItem('token')
               props.setLoggedIn(false)
@@ -84,37 +82,18 @@ export default function Form(props) {
               props.setSubmitted(!props.submitted)
               setField('')
               setTitle('')
-              history.push('/')
-            }
-  
-          } catch (err) {
-            console.log(err)
-          }
-        } else {
-          try {
-            const res = await axios.post('/api/posts/' + props.id, formData)
-            if (res.status === 502) {
-              localStorage.removeItem('token')
-              props.setLoggedIn(false)
-              history.push('/login')
-            }
-            if (!res) {
-              alert('No response')
-            } else {
-              // console.log(res)
-              props.setSubmitted(!props.submitted)
-              setField('')
-              setTitle('')
+              setFile()
               history.push('/thread/' + props.id)
+
             }
-  
+
           } catch (err) {
             console.log(err)
           }
-        }
+        
       }
     }
-    else {console.log('wait!')}
+    else { console.log('wait!') }
   }
 
   // console.log(file)
@@ -138,11 +117,11 @@ export default function Form(props) {
         {/* {isEmpty && <h1 className="text-red-700 flex justify-center mt-4">Title can't be Empty</h1>} */}
         {posted && <div className="flex justify-center mt-4">
           <input id="fileButton" type="file" hidden onChange={handleUpload} />
-          <label for="fileButton" className={posted?"px-4 py-2 mx-2 text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600 cursor-pointer":"invisible"}>
+          <label for="fileButton" className={posted ? "px-4 py-2 mx-2 text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600 cursor-pointer" : "invisible"}>
             Upload Image
           </label>
           {/* <button className="px-4 py-2 mx-2 text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600" onChange={handleUpload}>Upload Image</button> */}
-          <button className={posted?"px-4 py-2 mx-2 text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600 cursor-pointer":"invisible"} type="submit" onClick={handleSubmit}>Post</button>
+          <button className={posted ? "px-4 py-2 mx-2 text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600 cursor-pointer" : "invisible"} type="submit" onClick={handleSubmit}>Post</button>
         </div>}
         {!posted && <div className="flex justify-center mt-4">
           <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-8 w-8 "></div>

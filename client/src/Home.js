@@ -43,7 +43,7 @@ export default function Home(props) {
       {/* {props.loggedIn &&  <Form msg='Question' setLoggedIn={props.setLoggedIn} />}  */}
       {props.loggedIn && <Form msg='Question' setLoggedIn={props.setLoggedIn} setSubmitted={setSubmitted} submitted={submitted}/>} 
 
-      {posts && posts.map((post) => (
+      {posts && posts.slice(0).reverse().map((post) => (
         <CommentCard msg='View discussion' post={post}/>
         // <h1>{post._id}</h1>
       ))}

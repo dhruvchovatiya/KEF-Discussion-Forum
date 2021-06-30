@@ -41,11 +41,27 @@ router.post("/", async (req, res) => {
 });
 
 //ADD COMMENT
-//********CHANGE SO ONLY LOGGED IN USERS CAN POST COMMENTS
 router.post("/:id", async (req, res) => {
-  
-  const newComment = new Comment(req.body)
+
   try {
+    const jwtUser = jwt.verify(req.body.token, process.env.JWT_SECRET)
+    const user = await User.findById(jwtUser.id)
+    const commTemp = req.body
+    commTemp.firstName = user.firstName
+    commTemp.lastName = user.lastName
+    commTemp.email = user.email
+
+    let ts = Date.now();
+
+    let date_ob = new Date(ts);
+    let date = date_ob.getDate();
+    let month = date_ob.getMonth() + 1;
+    let year = date_ob.getFullYear();
+
+    commTemp.date = date+'-'+month+'-'+year
+    const newComment = new Comment(commTemp)
+
+
     let newPost = await Post.findById(req.params.id)
     newPost.comments.push(newComment)
     newPost.save()
@@ -57,15 +73,15 @@ router.post("/:id", async (req, res) => {
 
 //VOTE ANSWER
 router.post("/voteComment/:postId/:commentId", async (req, res) => {
-  
+
   try {
     const jwtUser = jwt.verify(req.body.token, process.env.JWT_SECRET)
 
     let post = await Post.findById(req.params.postId)
-    
-    for(comment of post.comments) {
-      if(comment._id==req.params.commentId) {
-        if(req.body.up=='true') {
+
+    for (comment of post.comments) {
+      if (comment._id == req.params.commentId) {
+        if (req.body.up == 'true') {
           comment.votes++
         } else {
           comment.votes--
@@ -73,20 +89,20 @@ router.post("/voteComment/:postId/:commentId", async (req, res) => {
         break
       }
     }
-    
+
     let upDown = -1
-    if(req.body.up=='true') upDown=1
-    
+    if (req.body.up == 'true') upDown = 1
+
     post.markModified('comments');
     const savedPost = await post.save()
-    
+
     const user = await User.findById(jwtUser.id)
-    let flag=false
+    let flag = false
     // console.log(flag)
-    for(obj of user.voted) {
-      if(obj.commentId===req.params.commentId) {
-        flag=true
-        if(req.body.up=='true') {
+    for (obj of user.voted) {
+      if (obj.commentId === req.params.commentId) {
+        flag = true
+        if (req.body.up == 'true') {
           obj.vote++
         } else {
           obj.vote--
@@ -94,16 +110,22 @@ router.post("/voteComment/:postId/:commentId", async (req, res) => {
       }
     }
     // console.log(flag)
-    if(!flag) {
-      user.voted.push({postId:req.params.postId,commentId:req.params.commentId,vote:1})
+    if (!flag) {
+      let votedElement = {
+        postId: req.params.postId,
+        commentId: req.params.commentId,
+        vote: 1
+      }
+      if(req.body.up!='true') votedElement.vote=-1
+      user.voted.push(votedElement)
     }
-    
+
     // console.log(user)
     user.markModified('voted')
     const savedUser = await user.save()
     // console.log(savedUser)
-    res.status(200).json({savedPost,savedUser})
-  
+    res.status(200).json({ savedPost, savedUser })
+
 
   } catch (err) {
     res.status(500).json(err)
@@ -135,13 +157,13 @@ router.post("/voteComment/:postId/:commentId", async (req, res) => {
 
 //     }
 //   }
-    
-    
+
+
 //       // try {
 //         const jwtUser = jwt.verify(req.body.token, process.env.JWT_SECRET)
 //         let user = await User.findById(jwtUser.id)
 //         // console.log(user)
-        
+
 //         if(user.votedPosts.includes(req.params.id)) {
 //       console.log('a')
 //       console.log(user)
@@ -171,12 +193,12 @@ router.post("/voteComment/:postId/:commentId", async (req, res) => {
 //           //   return res.status(501)
 
 //           // }
-       
+
 //       // } catch(err) {
 //       //   res.status(502).json(err)
 //       // }
 
-  
+
 // })
 
 //ADD COMMENT
