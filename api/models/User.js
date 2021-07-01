@@ -25,6 +25,14 @@ const UserSchema = new mongoose.Schema(
     voted: {
       type: Array,
       required: true 
+    },
+    posts: {
+      type: Array,
+      required: true
+    },
+    comments: {
+      type: Array,
+      required: true
     }
   },
   { timestamps: true }

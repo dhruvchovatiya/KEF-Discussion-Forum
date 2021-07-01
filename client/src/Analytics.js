@@ -1,9 +1,164 @@
 import React from 'react'
+import './Analytics.css'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
+
+var _ = require('underscore')
+
 
 export default function Analytics() {
+
+    const [newUsers, setNewUsers] = useState([])
+    const [sortedField, setSortedField] = useState()
+    const [direc, setDirec] = useState(false)
+
+
+    if (sortedField !== null) {
+        if (sortedField == 'comments.length') {
+            newUsers.sort((a, b) => {
+                if (a.comments.length< b.comments.length) {
+                    return direc?1:-1
+
+                }
+                if (a.comments.length > b.comments.length) {
+                    return direc?-1:1
+
+                }
+                return 0;
+            });
+        }
+        if(sortedField=='posts.length' ){
+            newUsers.sort((a, b) => {
+                if (a.posts.length< b.posts.length) {
+                    return direc?1:-1
+
+                }
+                if (a.posts.length > b.posts.length) {
+                    return direc?-1:1
+
+                }
+                return 0;
+            });
+        }
+        newUsers.sort((a, b) => {
+            if (a[sortedField] < b[sortedField]) {
+                return direc?1:-1
+            }
+            if (a[sortedField] > b[sortedField]) {
+                return direc?-1:1
+            }
+            return 0;
+        });
+    }
+
+    useEffect(() => {
+
+
+        const getVotes = async () => {
+
+            try {
+                setNewUsers([])
+                // await fetchUsers()
+                const res = await axios.get('/api/users')
+
+                // setUsers(res.data)
+                console.log(res.data)
+                let user
+                for (user of res.data) {
+
+                    const votes = await axios.get('/api/users/votes/' + user._id)
+
+                    let newElement = user
+                    newElement.votes = votes.data
+                    setNewUsers((newUsers) => [...newUsers, newElement])
+                }
+
+                // const temp = newUsers.sort()
+
+                // setNewUsers([])
+                // setNewUsers(temp)
+
+            } catch (err) {
+                console.log(err)
+            }
+
+        }
+
+        getVotes()
+    }, [])
+
+    const sortUsersName = () => {
+        console.log('name')
+        const sortedByName = _.sortBy(newUsers, 'firstName')
+        setNewUsers(sortedByName)
+    }
+
+    const sortDoubtsAsked = () => {
+        console.log('name')
+        const sortedByDoubtsAsked = _.sortBy(newUsers, 'posts.length')
+        setNewUsers(sortedByDoubtsAsked)
+    }
+
+    const sortDoubtsAnswered = () => {
+        console.log('name')
+        // const sortedByDoubtsAnswered = _.sortBy(newUsers,'comments.length').reverse()
+        let temp = newUsers
+        temp.sort(function (a, b) {
+            return b.comments.length - a.comments.length;
+        });
+        console.log(temp)
+        setNewUsers([])
+        setNewUsers(temp)
+    }
+
+
     return (
         <div>
-            ANALYTICSSS
+            {/* component */}
+            {/* <style dangerouslySetInnerHTML={{ __html: "\n    body{background:white!important;}\n" }} /> */}
+            <p className="text-lg text-center font-bold m-5">Analytics</p>
+            <table className="rounded-t-lg m-5 w-5/6 mx-auto bg-blue-900 text-white shadow-lg">
+                <tbody><tr className="border-b-2 border-red-500 text-center ">
+                    <th onClick={() => {setSortedField('firstName'); setDirec(!direc)}} className="px-4 py-3 font-semibold  text-center hover:bg-blue-800 cursor-pointer">{sortedField=='firstName'?(direc?'Name ↑':'Name ↓'):'Name'}</th>
+                    <th onClick={() => {setSortedField('posts.length'); setDirec(!direc)}} className="px-4 py-3 font-semibold text-center hover:bg-blue-800 cursor-pointer">{sortedField=='posts.length'?(direc?'Doubts Asked ↑':'Doubts Asked ↓'):'Doubts Asked'}</th>
+                    <th onClick={() => {setSortedField('comments.length'); setDirec(!direc)}} className="px-4 py-3 font-semibold text-center hover:bg-blue-800 cursor-pointer">{sortedField=='comments.length'?(direc?'Doubts Answered ↑':'Doubts Answered ↓'):'Doubts Answered'}</th>
+                    <th onClick={() => {setSortedField('votes'); setDirec(!direc)}} className="px-4 py-3 font-semibold text-center hover:bg-blue-800 cursor-pointer">{sortedField=='votes'?(direc?'Total Votes ↑':'Total Votes ↓'):'Total Votes'}</th>
+                </tr>
+
+
+
+                    {/* {users.slice(0).reverse().map(async (user) => (
+                       
+                        // console.log(await getVotes(user._id))
+
+                        
+
+                        // <h1>{post._id}</h1>
+                    ))} */}
+
+
+
+
+                    {newUsers.slice(0).reverse().map((user) => (
+                        // <td msg='View discussion' post={post} />
+                        // <td className="px-4 py-3 text-center text-black">{user.firstName}</td>
+
+                        <tr className="bg-white border-b border-gray-200">
+                            <td className="px-4 py-3 text-center text-black  hover:bg-blue-200 cursor-pointer">{user.firstName + ' ' + user.lastName}</td>
+                            <td className="px-4 py-3 text-center text-black">{user.posts ? user.posts.length : '0'}</td>
+                            <td className="px-4 py-3 text-center text-black">{user.comments ? user.comments.length : '0'}</td>
+                            <td className="px-4 py-3 text-center text-black">{user.votes ? user.votes : '0'}</td>
+                        </tr>
+
+                    ))}
+
+
+                </tbody></table>
+            {/* classic design */}
+
+            <div className="mb-20" />
+            {/* fill for tailwind preview bottom overflow */}
         </div>
+
     )
 }

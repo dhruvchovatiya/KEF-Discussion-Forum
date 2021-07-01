@@ -31,7 +31,9 @@ router.post("/", async (req, res) => {
 
     try {
       const savedPost = await newPost.save();
-      res.status(200).json(savedPost);
+      user.posts.push(savedPost._id)
+      const savedUser = await user.save();
+      res.status(200).json({savedPost,savedUser});
     } catch (err) {
       res.status(500).json(err);
     }
@@ -61,10 +63,12 @@ router.post("/:id", async (req, res) => {
     commTemp.date = date+'-'+month+'-'+year
     const newComment = new Comment(commTemp)
 
-
+    
     let newPost = await Post.findById(req.params.id)
     newPost.comments.push(newComment)
     newPost.save()
+    user.comments.push({postId: newPost._id, commentId: newComment._id, arrayIn: newPost.comments.length-1})
+    user.save()
     res.status(200).json(newPost)
   } catch (err) {
     res.status(500).json(err);

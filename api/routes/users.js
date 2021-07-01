@@ -1,5 +1,8 @@
 const router = require("express").Router();
 const User = require("../models/User");
+const Comment = require("../models/Comment")
+const Post = require("../models/Post")
+
 
 
 //Get all users
@@ -12,6 +15,24 @@ router.get('/', async (req,res) => {
     }
 })
 
+//get user's votes
+router.get('/votes/:id', async (req,res) => {
+    try {
+        const user = await User.findById(req.params.id)
+        let totalVotes=0
+        // console.log(user.comments)
+        for(commElement of user.comments) {
+            const post = await Post.findById(commElement.postId)
+            // console.log(post)
+            totalVotes+=post.comments[commElement.arrayIn].votes
+        }
+        res.status(200).json(totalVotes)
+    } catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+//Get user by id
 router.get('/:id', async (req,res) => {
     try {
         const user = await User.findById(req.params.id)
