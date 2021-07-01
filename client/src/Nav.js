@@ -1,17 +1,37 @@
 import React from 'react'
 import logo from './resources/Kotak_Mahindra_Bank_logo.svg'
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 export default function Nav({loggedIn,setLoggedIn}) {
 
   const [expanded, setExpanded] = useState(false)
+  const [user, setUser] = useState()
   
   const logoutHandler = () => {
     setLoggedIn(false)
     localStorage.removeItem('token')
     setExpanded(false)
   }
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        
+        if(!loggedIn) {
+          return
+        }
+        const token = localStorage.getItem('token')
+        const res = await axios.get('/api/users/jwt/'+token)
+        setUser(res.data)
+      } catch (err) {
+        console.log(err)
+      }
+    }
+
+    fetchUser()
+  }, [])
 
   return (
 
@@ -69,6 +89,10 @@ export default function Nav({loggedIn,setLoggedIn}) {
               {
                 !loggedIn && 
                 <Link to='/signup' onClick={()=>setExpanded(false)} className="mt-2 lg:mt-0 lg:mx-4 hover:text-white hover:bg-red-700 dark:hover:text-gray-200 bg-red-600 px-4 py-2 rounded-md">Sign Up</Link>
+              }
+              {
+                loggedIn && user &&
+                <Link to={'/user/'+user._id} className="mt-2 lg:mt-0 lg:mx-4 hover:text-white  ">{user.firstName} {user.lastName}</Link>
               }
               {
                 loggedIn && 

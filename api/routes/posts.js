@@ -266,6 +266,7 @@ router.post("/voteComment/:postId/:commentId", async (req, res) => {
 // GET POST
 router.get("/:id", async (req, res) => {
   try {
+    // console.log('here')
     const post = await Post.findById(req.params.id);
     res.status(200).json(post);
   } catch (err) {
@@ -273,7 +274,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-//GET ALL POSTS
+// GET ALL POSTS
 router.get("/", async (req, res) => {
   const username = req.query.user;
   const catName = req.query.cat;

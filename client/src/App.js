@@ -8,6 +8,7 @@ import SignUp from './SignUp.js';
 import About from './About.js';
 import Home from './Home.js';
 import Analytics from './Analytics.js';
+import UserPage from './UserPage.js';
 import { useState, useEffect } from 'react';
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
           <Route path="/about" component={About} />
           <Route path="/analytics" component={Analytics} />
           <Route path="/thread/:id" render={(props)=><Thread loggedIn={loggedIn}/>} />
+          <Route path="/user/:id" component={UserPage} />
 
 
         </Switch>
